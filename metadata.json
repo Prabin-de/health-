@@ -1,0 +1,7 @@
+{
+  "name": "Copy of VitalShield Health Monitor",
+  "description": "A high-performance health dashboard that integrates ESP32 sensor data via ThingSpeak, providing real-time visualization and AI-powered medical insights using Gemini.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

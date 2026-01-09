@@ -1,0 +1,22 @@
+
+{
+  "short_name": "VitalShield",
+  "name": "VitalShield Health Monitor",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2966/2966327.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2966/2966327.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "background_color": "#020617",
+  "display": "standalone",
+  "theme_color": "#4f46e5",
+  "description": "Real-time health monitoring with ESP32 and Gemini AI."
+}
