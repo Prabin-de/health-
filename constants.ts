@@ -17,4 +17,7 @@ export const STORAGE_KEYS = {
   SETTINGS: 'vitalshield_settings',
   USER: 'vitalshield_user_session',
   USERS_DB: 'vitalshield_registered_users',
+  DB: 'vitalshield_db_v2',
 };
+
+export const MAX_USERS = 10;
