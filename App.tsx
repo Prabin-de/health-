@@ -5,41 +5,35 @@ import History from './components/History';
 import HealthInsights from './components/HealthInsights';
 import Settings from './components/Settings';
 import Auth from './components/Auth';
-import { Settings as SettingsType, User } from './types';
+import NHSConditions from './components/NHSConditions';
+import { useAuth } from './contexts/AuthContext';
+import { Settings as SettingsType } from './types';
 import { DEFAULT_SETTINGS, STORAGE_KEYS } from './constants';
 
+type Tab = 'dashboard' | 'history' | 'insights' | 'nhs' | 'settings';
+
 const App: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'insights' | 'settings'>('dashboard');
+  const { user, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [settings, setSettings] = useState<SettingsType>(DEFAULT_SETTINGS);
 
   useEffect(() => {
-    // Load Settings
     const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
     if (savedSettings) setSettings(JSON.parse(savedSettings));
-
-    // Load User Session
-    const savedUser = localStorage.getItem(STORAGE_KEYS.USER);
-    if (savedUser) setUser(JSON.parse(savedUser));
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem(STORAGE_KEYS.USER);
-    setUser(null);
-  };
-
   if (!user) {
-    return <Auth onVerify={setUser} />;
+    return <Auth />;
   }
 
-  const NavItem: React.FC<{ tab: typeof activeTab; icon: string; label: string }> = ({ tab, icon, label }) => {
+  const NavItem: React.FC<{ tab: Tab; icon: string; label: string }> = ({ tab, icon, label }) => {
     const isActive = activeTab === tab;
     return (
-      <button 
+      <button
         onClick={() => setActiveTab(tab)}
         className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold transition-all group ${
-          isActive 
-            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' 
+          isActive
+            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100'
             : 'text-slate-500 hover:bg-slate-100'
         }`}
       >
@@ -68,7 +62,7 @@ const App: React.FC = () => {
           </div>
           <div className="overflow-hidden">
             <p className="text-xs font-bold text-slate-800 truncate">{user.patientName}</p>
-            <p className="text-[10px] text-slate-500">Local ID: {user.patientCode}</p>
+            <p className="text-[10px] text-slate-500">ID: {user.patientCode}</p>
           </div>
         </div>
 
@@ -76,10 +70,11 @@ const App: React.FC = () => {
           <NavItem tab="dashboard" icon="fa-chart-pie" label="Vitals Dashboard" />
           <NavItem tab="history" icon="fa-clock-rotate-left" label="Patient History" />
           <NavItem tab="insights" icon="fa-stethoscope" label="Health Insights" />
+          <NavItem tab="nhs" icon="fa-hospital" label="NHS Conditions" />
           <div className="mt-auto pt-8 border-t border-slate-50 flex flex-col gap-2">
             <NavItem tab="settings" icon="fa-gear" label="Configuration" />
-            <button 
-              onClick={handleLogout}
+            <button
+              onClick={logout}
               className="flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold text-rose-500 hover:bg-rose-50 transition-all"
             >
               <i className="fas fa-sign-out-alt"></i>
@@ -94,6 +89,7 @@ const App: React.FC = () => {
           {activeTab === 'dashboard' && <Dashboard settings={settings} />}
           {activeTab === 'history' && <History settings={settings} />}
           {activeTab === 'insights' && <HealthInsights settings={settings} />}
+          {activeTab === 'nhs' && <NHSConditions />}
           {activeTab === 'settings' && <Settings settings={settings} onUpdate={setSettings} />}
         </div>
       </main>
@@ -102,3 +98,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+

@@ -50,3 +50,10 @@ export interface HealthAnalysisResult {
   suggestions: string[];
   alerts: string[];
 }
+
+export interface NHSCondition {
+  name: string;
+  description: string;
+  url: string;
+}
+
