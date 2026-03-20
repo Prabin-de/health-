@@ -6,6 +6,7 @@ import HealthInsights from './components/HealthInsights';
 import Settings from './components/Settings';
 import Auth from './components/Auth';
 import NHSConditions from './components/NHSConditions';
+import ErrorBoundary from './components/ErrorBoundary';
 import { useAuth } from './contexts/AuthContext';
 import { Settings as SettingsType } from './types';
 import { DEFAULT_SETTINGS, STORAGE_KEYS } from './constants';
@@ -86,11 +87,13 @@ const App: React.FC = () => {
 
       <main className="flex-grow p-4 md:p-10 lg:p-12 overflow-y-auto">
         <div className="max-w-6xl mx-auto">
-          {activeTab === 'dashboard' && <Dashboard settings={settings} />}
-          {activeTab === 'history' && <History settings={settings} />}
-          {activeTab === 'insights' && <HealthInsights settings={settings} />}
-          {activeTab === 'nhs' && <NHSConditions />}
-          {activeTab === 'settings' && <Settings settings={settings} onUpdate={setSettings} />}
+          <ErrorBoundary>
+            {activeTab === 'dashboard' && <Dashboard settings={settings} />}
+            {activeTab === 'history' && <History settings={settings} />}
+            {activeTab === 'insights' && <HealthInsights settings={settings} />}
+            {activeTab === 'nhs' && <NHSConditions />}
+            {activeTab === 'settings' && <Settings settings={settings} onUpdate={setSettings} />}
+          </ErrorBoundary>
         </div>
       </main>
     </div>

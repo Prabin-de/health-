@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { User } from '../types';
-import { findUserByName, addUser, getUsers, hashPassword } from '../services/dbService';
+import { findUserByName, addUser, getUsers, hashPassword, verifyPassword } from '../services/dbService';
 import { MAX_USERS } from '../constants';
 
 const Auth: React.FC = () => {
@@ -24,11 +24,10 @@ const Auth: React.FC = () => {
     setLoading(true);
 
     try {
-      const passwordHash = await hashPassword(password);
-
       if (isLogin) {
         const found = findUserByName(name);
-        if (found && found.passwordHash === passwordHash) {
+        const passwordOk = found ? await verifyPassword(password, found.passwordHash) : false;
+        if (found && passwordOk) {
           const sessionUser: User = {
             patientName: found.patientName,
             patientCode: found.patientCode,
@@ -48,6 +47,7 @@ const Auth: React.FC = () => {
         if (findUserByName(name)) {
           setError('User already exists. Please sign in.');
         } else {
+          const passwordHash = await hashPassword(password);
           const newUser = {
             patientName: name,
             patientCode: `VS-${Math.floor(1000 + Math.random() * 9000)}`,

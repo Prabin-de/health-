@@ -10,6 +10,51 @@ interface HistoryProps {
   settings: Settings;
 }
 
+function exportCSV(records: HealthRecord[]): void {
+  const headers = [
+    'Date',
+    'Time',
+    'Heart Rate (BPM)',
+    'SpO2 (%)',
+    'Body Temp (°C)',
+    'Room Temp (°C)',
+    'Humidity (% RH)',
+    'Acceleration (G)',
+    'Status',
+  ];
+
+  const rows = records
+    .slice()
+    .reverse()
+    .map(r => {
+      const dt = new Date(r.created_at);
+      const isWarning = r.spo2 < 94 || r.bpm > 110 || r.bpm < 55;
+      return [
+        dt.toLocaleDateString(),
+        dt.toLocaleTimeString(),
+        r.bpm.toFixed(0),
+        r.spo2.toFixed(1),
+        r.temp.toFixed(1),
+        r.room_temp.toFixed(1),
+        r.humidity.toFixed(0),
+        r.accel.toFixed(2),
+        isWarning ? 'Review Needed' : 'Stable',
+      ];
+    });
+
+  const csv = [headers, ...rows]
+    .map(row => row.map(cell => `"${cell}"`).join(','))
+    .join('\n');
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `vitalshield-history-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 const History: React.FC<HistoryProps> = ({ settings }) => {
   const [history, setHistory] = useState<HealthRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +89,11 @@ const History: React.FC<HistoryProps> = ({ settings }) => {
             <h2 className="text-xl font-bold text-slate-800">Historical Trends</h2>
             <p className="text-sm text-slate-500">Overview of the last 50 telemetry packets</p>
           </div>
-          <button className="px-4 py-2 bg-slate-50 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-100 transition-colors flex items-center gap-2">
+          <button
+            onClick={() => exportCSV(history)}
+            disabled={history.length === 0}
+            className="px-4 py-2 bg-slate-50 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-100 transition-colors flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
             <i className="fas fa-download"></i> Export CSV
           </button>
         </div>
@@ -135,3 +184,4 @@ const History: React.FC<HistoryProps> = ({ settings }) => {
 };
 
 export default History;
+
